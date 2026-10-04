@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>المتجر</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"></script>
+<script>
+// بيانات مشروع Firebase — هذا الملف الوحيد الذي تعدّله، ويستعمله موقع الزبائن ولوحة التحكم معاً.
+const firebaseConfig = {
+  apiKey: "AIzaSyCS45ePo0zSI3aSCgnrJhbaTKT7la7dOcU",
+  authDomain: "basbosa-2af18.firebaseapp.com",
+  projectId: "basbosa-2af18",
+  storageBucket: "basbosa-2af18.firebasestorage.app",
+  messagingSenderId: "829632382456",
+  appId: "1:829632382456:web:f9a66f9a522e74c321420d"
+};
+</script>
+<style>
+:root{--bg:#fcfaf6;--card:#fdfaf6;--ink:#3b1e08;--muted:#7a6454;--gold:#a8791c;--line:#eadfd3;--shadow:rgba(59,30,8,.12);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c130d;--card:#261a12;--ink:#f3e6d6;--muted:#b9a592;--gold:#d9a846;--line:#3a2a1e;--shadow:rgba(0,0,0,.4)}}
+:root[data-theme="dark"]{--bg:#1c130d;--card:#261a12;--ink:#f3e6d6;--muted:#b9a592;--gold:#d9a846;--line:#3a2a1e;--shadow:rgba(0,0,0,.4)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Naskh Arabic',Georgia,serif}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 20px 80px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+h1,h3,.price{font-family:Amiri,'Noto Naskh Arabic',Georgia,serif}
+h1{font-size:clamp(30px,5vw,48px);font-weight:600;margin:0 0 28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:26px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 10px 30px var(--shadow);position:relative}
+.img{aspect-ratio:4/3;background:linear-gradient(135deg,#7a4a1e,#2d1606);background-size:cover;background-position:center}
+.body{padding:22px 26px 26px}
+.row{display:flex;justify-content:space-between;align-items:center}
+.cat{color:var(--gold);font-size:14px;letter-spacing:0;font-weight:500}
+.price{font-weight:500;font-size:17px}
+h3{font-size:24px;font-weight:600;margin:18px 0 10px}
+.desc{color:var(--muted);line-height:2;font-size:16px;margin:0 0 22px}
+.btns{display:flex;gap:14px}
+button{font:inherit;cursor:pointer}
+.btn{flex:1;padding:14px 10px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:15px}
+.btn.dark{background:var(--ink);color:var(--bg);border-color:var(--ink);box-shadow:0 8px 16px var(--shadow)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.cartbtn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:10px 18px;font-size:15px;white-space:nowrap}
+.adm{position:absolute;top:10px;inset-inline-end:10px;display:none;gap:6px}
+body.admin .adm{display:flex}
+.adm button{background:#fff;color:#3b1e08;border:0;border-radius:999px;padding:6px 12px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.bar{display:none;gap:8px;flex-wrap:wrap;margin:-10px 0 20px;direction:rtl;font-family:system-ui,sans-serif}
+body.admin .bar{display:flex}
+.bar button{border-radius:999px;border:1px solid var(--gold);background:transparent;color:var(--ink);padding:8px 14px;font-size:14px}
+.lock{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom,0px));inset-inline-start:14px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13px;color:var(--muted);font-family:system-ui,sans-serif}
+.ov{position:fixed;inset:0;background:rgba(20,10,3,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+.ov.on{display:flex}
+.box{background:var(--card);color:var(--ink);border-radius:18px;padding:22px;width:100%;max-width:440px;max-height:90vh;overflow:auto;direction:rtl;font-family:system-ui,sans-serif}
+.box h2{margin:0 0 14px;font-size:19px}
+.box label{display:block;font-size:13px;color:var(--muted);margin:12px 0 4px}
+.box input,.box textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:15px}
+.box textarea{min-height:80px}
+.box .btns{margin-top:18px}
+.ci{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.ci .q button{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.total{display:flex;justify-content:space-between;font-weight:600;margin-top:14px;font-size:17px}
+.empty{color:var(--muted);text-align:center;padding:20px}
+
+.adm button.x{background:var(--ink);color:var(--bg)}
+.banner{display:none;background:var(--ink);color:var(--bg);text-align:center;padding:8px;font:14px system-ui,sans-serif;direction:rtl}
+body.admin .banner{display:block}
+.bar .pub{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.bar .pub[disabled]{opacity:.45}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><h1 id="title"></h1><button class="cartbtn" id="cartOpen">السلة (<span id="cnt">0</span>)</button></div>
+  <div class="grid" id="grid"></div>
+</div>
+<div class="ov" id="ovCart"><div class="box" style="direction:rtl;font-family:'Noto Naskh Arabic',serif">
+  <h2 style="font-family:Amiri,serif;font-size:24px">سلتك</h2>
+  <div id="ci"></div>
+  <div class="total"><span>الإجمالي</span><span id="tot"></span></div>
+  <label>اسمك</label><input id="cName">
+  <label>رقم الجوال (10 أرقام)</label><input id="cAddr" type="tel" inputmode="numeric" maxlength="10" pattern="[0-9]*" autocomplete="tel">
+  <div class="btns"><button class="btn dark" id="order">إرسال الطلب</button><button class="btn" data-close>إغلاق</button></div>
+</div></div>
+
+<div class="ov" id="ovView"><div class="box" style="direction:rtl;font-family:'Noto Naskh Arabic',serif;padding:0;overflow:hidden">
+  <div class="img" id="vImg"></div>
+  <div class="body"><div class="row"><span class="cat" id="vCat"></span><span class="price" id="vPrice"></span></div><h3 id="vName"></h3><p class="desc" id="vDesc"></p><div class="btns"><button class="btn dark" id="vAdd">أضف إلى السلة</button><button class="btn" data-close>إغلاق</button></div></div>
+</div></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let S={title:'',cur:'$',wa:'',items:[]},cart={},viewId=null;
+const money=n=>S.cur+Number(n).toFixed(2);
+const bg=p=>p.img?`background-image:url('${esc(p.img)}')`:'';
+function render(){
+  $('title').textContent=S.title;document.title=S.title;
+  $('grid').innerHTML=S.items.map(p=>`<article class="card"><div class="img" style="${bg(p)}"></div>
+  <div class="body"><div class="row"><span class="cat">${esc(p.cat)}</span><span class="price">${money(p.price)}</span></div>
+  <h3>${esc(p.name)}</h3><p class="desc">${esc(p.desc)}</p>
+  <div class="btns"><button class="btn" data-v="${p.id}">عرض التفاصيل</button><button class="btn dark" data-a="${p.id}">أضف إلى السلة</button></div></div></article>`).join('');
+  if(ready&&!S.items.length)$('grid').innerHTML='<p class="empty">لا توجد أصناف حالياً.</p>';
+  $('cnt').textContent=Object.values(cart).reduce((a,b)=>a+b,0);
+}
+function renderCart(){
+  const ids=Object.keys(cart).filter(i=>S.items.some(p=>p.id==i));let t=0;
+  $('ci').innerHTML=ids.length?ids.map(i=>{const p=S.items.find(p=>p.id==i);t+=p.price*cart[i];
+  return `<div class="ci"><span>${esc(p.name)}<br><small>${money(p.price)}</small></span><span class="q"><button data-m="${i}">−</button> ${cart[i]} <button data-p="${i}">+</button></span></div>`}).join(''):'<div class="empty">سلتك فارغة.</div>';
+  $('tot').textContent=money(t);
+}
+const open=id=>$(id).classList.add('on'),shut=()=>document.querySelectorAll('.ov').forEach(o=>o.classList.remove('on'));
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t){if(e.target.classList.contains('ov'))shut();return}
+  if(t.dataset.close!==undefined)shut();
+  if(t.dataset.a){cart[t.dataset.a]=(cart[t.dataset.a]||0)+1;render();t.textContent='تمت الإضافة ✓';setTimeout(render,900)}
+  if(t.dataset.v){const p=S.items.find(p=>p.id==t.dataset.v);viewId=p.id;$('vImg').style.cssText=bg(p);$('vCat').textContent=p.cat;$('vPrice').textContent=money(p.price);$('vName').textContent=p.name;$('vDesc').textContent=p.desc;open('ovView')}
+  if(t.dataset.m||t.dataset.p){const i=t.dataset.m||t.dataset.p;cart[i]=(cart[i]||0)+(t.dataset.p?1:-1);if(cart[i]<=0)delete cart[i];render();renderCart()}
+});
+$('vAdd').onclick=()=>{cart[viewId]=(cart[viewId]||0)+1;render();shut()};
+$('cartOpen').onclick=()=>{renderCart();open('ovCart')};
+$('cAddr').oninput=e=>{e.target.value=e.target.value.replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\D/g,'').slice(0,10)};
+$('order').onclick=()=>{
+  const ids=Object.keys(cart).filter(i=>S.items.some(p=>p.id==i));if(!ids.length)return;
+  const name=$('cName').value.trim(),phone=$('cAddr').value;
+  if(!name){alert('أدخل اسمك');return}
+  if(!/^\d{10}$/.test(phone)){alert('أدخل رقم جوال صحيح من 10 أرقام بالضبط');return}
+  if(!S.wa){alert('الطلبات غير مفعّلة حالياً.');return}
+  let t=0;const its=ids.map(i=>{const p=S.items.find(p=>p.id==i);t+=p.price*cart[i];return {name:p.name,qty:cart[i],price:p.price}});
+  const msg=`طلب جديد\n${its.map(x=>`• ${x.name} × ${x.qty} = ${money(x.price*x.qty)}`).join('\n')}\nالإجمالي: ${money(t)}\nالاسم: ${name}\nرقم الجوال: ${phone}`;
+  window.open(`https://wa.me/${S.wa}?text=${encodeURIComponent(msg)}`,'_blank');
+  try{db.collection('orders').add({items:its,total:t,name,details:phone,status:'new',createdAt:Date.now()}).catch(()=>{})}catch(e){}
+  cart={};render();$('cName').value='';$('cAddr').value='';shut();
+};
+let ready=false,db;
+try{
+  firebase.initializeApp(firebaseConfig);db=firebase.firestore();
+  try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{})}catch(e){}
+  const col=db.collection('app_data'),F=firebase.firestore.FieldPath.documentId();
+  col.doc('settings').onSnapshot(d=>{if(d.exists){try{Object.assign(S,JSON.parse(d.data().value))}catch(e){}}render()});
+  col.where(F,'>=','product:').where(F,'<','product:\uf8ff').onSnapshot(q=>{
+    S.items=q.docs.map(d=>{try{return JSON.parse(d.data().value)}catch(e){return null}}).filter(Boolean).sort((a,b)=>(a.order||0)-(b.order||0));ready=true;render()},
+    ()=>{$('grid').innerHTML='<p class="empty">تعذّر تحميل المنتجات.</p>'});
+}catch(e){$('grid').innerHTML='<p class="empty">أكمل إعداد ملف firebase-config.js</p>'}
+</script>
+</body>
+</html>
